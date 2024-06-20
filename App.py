@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a real secret key
@@ -32,7 +33,7 @@ def login():
         return redirect(url_for('admin_home'))
     else:
         return "Invalid credentials", 401
-#test
+
 @app.route('/admin')
 def admin_home():
     if 'username' in session:
@@ -45,12 +46,82 @@ def logout():
     session.pop('username', None)  # Remove the username from the session
     return redirect(url_for('home'))
 
-@app.route('/AdminDocs')
-def AdminDocs():
+@app.route('/admin/doctors')
+def manage_doctors():
     if 'username' in session:
-        return render_template('Admin_Manage_Doctors.html')
+        doctors = db.doctors.find()
+        return render_template('Admin_Manage_Doctors.html', doctors=doctors, action='Add')
     else:
         return redirect(url_for('home'))
+
+@app.route('/admin/doctors/add', methods=['POST'])
+def add_doctor():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    name = request.form['name']
+    last_name = request.form['last_name']
+    email = request.form['email']
+    username = request.form['username']
+    password = request.form['password']
+    appointment_cost = float(request.form['appointment_cost'])
+    specialization = request.form['specialization']
+
+    if not email.endswith('@gmail.com'):
+        return "Email must end with @gmail.com", 400
+
+    db.doctors.insert_one({
+        'name': name,
+        'last_name': last_name,
+        'email': email,
+        'username': username,
+        'password': password,
+        'appointment_cost': appointment_cost,
+        'specialization': specialization
+    })
+    return redirect(url_for('manage_doctors'))
+
+@app.route('/admin/doctors/edit/<id>', methods=['POST'])
+def edit_doctor(id):
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    name = request.form['name']
+    last_name = request.form['last_name']
+    email = request.form['email']
+    username = request.form['username']
+    password = request.form['password']
+    appointment_cost = float(request.form['appointment_cost'])
+    specialization = request.form['specialization']
+
+    if not email.endswith('@gmail.com'):
+        return "Email must end with @gmail.com", 400
+
+    db.doctors.update_one(
+        {'_id': ObjectId(id)},
+        {'$set': {
+            'name': name,
+            'last_name': last_name,
+            'email': email,
+            'username': username,
+            'password': password,
+            'appointment_cost': appointment_cost,
+            'specialization': specialization
+        }}
+    )
+    return redirect(url_for('manage_doctors'))
+
+@app.route('/admin/doctors/delete/<id>')
+def delete_doctor(id):
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    db.doctors.delete_one({'_id': ObjectId(id)})
+    return redirect(url_for('manage_doctors'))
+
+@app.route('/about')
+def about():
+    return "This is the about page."
 
 @app.route('/contact')
 def contact():

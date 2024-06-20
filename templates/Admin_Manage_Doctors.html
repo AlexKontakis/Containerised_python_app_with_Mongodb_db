@@ -3,16 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Manage Doctors</title>
+    <title>Manage Doctors</title>
 </head>
 <body>
-    <h1>Doctor Management Page</h1>
-    <form action="/Create" method="post">
-        <label for="DocName">Name:</label>
-        <input type="text" id="username" name="username"><br><br>
+    <h1>Manage Doctors</h1>
+    <a href="#" onclick="resetForm()">Add Doctor</a>
+    <table border="1">
+        <tr>
+            <th>Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Appointment Cost</th>
+            <th>Specialization</th>
+            <th>Actions</th>
+        </tr>
+        {% for doctor in doctors %}
+        <tr>
+            <td>{{ doctor.name }}</td>
+            <td>{{ doctor.last_name }}</td>
+            <td>{{ doctor.email }}</td>
+            <td>{{ doctor.username }}</td>
+            <td>{{ doctor.appointment_cost }}</td>
+            <td>{{ doctor.specialization }}</td>
+            <td>
+                <button onclick="editDoctor('{{ doctor._id }}', '{{ doctor.name }}', '{{ doctor.last_name }}', '{{ doctor.email }}', '{{ doctor.username }}', '{{ doctor.password }}', {{ doctor.appointment_cost }}, '{{ doctor.specialization }}')">Edit</button>
+                <a href="/admin/doctors/delete/{{ doctor._id }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+    <h2 id="form-title">Add Doctor</h2>
+    <form id="doctor-form" action="/admin/doctors/add" method="post">
+        <input type="hidden" id="doctor_id" name="doctor_id">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name" required><br><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required><br><br>
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Login">
+        <input type="password" id="password" name="password" required><br><br>
+        <label for="appointment_cost">Appointment Cost:</label>
+        <input type="number" step="0.01" id="appointment_cost" name="appointment_cost" required><br><br>
+        <label for="specialization">Specialization:</label>
+        <input type="text" id="specialization" name="specialization" required><br><br>
+        <button type="submit" id="form-button">Add Doctor</button>
     </form>
+
+    <a href="/admin">Back to Admin Home</a>
+
+    <script>
+        function editDoctor(id, name, last_name, email, username, password, appointment_cost, specialization) {
+            document.getElementById('form-title').innerText = 'Edit Doctor';
+            document.getElementById('doctor-form').action = '/admin/doctors/edit/' + id;
+            document.getElementById('doctor_id').value = id;
+            document.getElementById('name').value = name;
+            document.getElementById('last_name').value = last_name;
+            document.getElementById('email').value = email;
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+            document.getElementById('appointment_cost').value = appointment_cost;
+            document.getElementById('specialization').value = specialization;
+            document.getElementById('form-button').innerText = 'Edit Doctor';
+        }
+
+        function resetForm() {
+            document.getElementById('form-title').innerText = 'Add Doctor';
+            document.getElementById('doctor-form').action = '/admin/doctors/add';
+            document.getElementById('doctor_id').value = '';
+            document.getElementById('name').value = '';
+            document.getElementById('last_name').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('appointment_cost').value = '';
+            document.getElementById('specialization').value = '';
+            document.getElementById('form-button').innerText = 'Add Doctor';
+        }
+    </script>
 </body>
 </html>
