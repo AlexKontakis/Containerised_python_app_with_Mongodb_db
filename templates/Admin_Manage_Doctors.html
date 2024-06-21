@@ -7,7 +7,7 @@
 </head>
 <body>
     <h1>Manage Doctors</h1>
-    <a href="#" onclick="resetForm()">Add Doctor</a>
+    <button onclick="resetForm()">Add Doctor</button>
     <table border="1">
         <tr>
             <th>Name</th>
@@ -28,7 +28,9 @@
             <td>{{ doctor.specialization }}</td>
             <td>
                 <button onclick="editDoctor('{{ doctor._id }}', '{{ doctor.name }}', '{{ doctor.last_name }}', '{{ doctor.email }}', '{{ doctor.username }}', '{{ doctor.password }}', {{ doctor.appointment_cost }}, '{{ doctor.specialization }}')">Edit</button>
-                <a href="/admin/doctors/delete/{{ doctor._id }}">Delete</a>
+                <form action="/admin/doctors/delete/{{ doctor._id }}" method="post" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
             </td>
         </tr>
         {% endfor %}
@@ -54,11 +56,14 @@
         <label for="specialization">Specialization:</label>
         <input type="text" id="specialization" name="specialization" required><br><br>
         <button type="submit" id="form-button">Add Doctor</button>
+        
     </form>
-
-    <a href="/admin">Back to Admin Home</a>
+    <button onclick="window.location.href='/admin'">Back to Admin Home</button>
+    
 
     <script>
+       
+
         function editDoctor(id, name, last_name, email, username, password, appointment_cost, specialization) {
             document.getElementById('form-title').innerText = 'Edit Doctor';
             document.getElementById('doctor-form').action = '/admin/doctors/edit/' + id;

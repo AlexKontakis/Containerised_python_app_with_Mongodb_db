@@ -111,7 +111,7 @@ def edit_doctor(id):
     )
     return redirect(url_for('manage_doctors'))
 
-@app.route('/admin/doctors/delete/<id>')
+@app.route('/admin/doctors/delete/<id>', methods=['POST'])
 def delete_doctor(id):
     if 'username' not in session:
         return redirect(url_for('home'))
