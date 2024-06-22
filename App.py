@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a real secret key
@@ -119,13 +120,78 @@ def delete_doctor(id):
     db.doctors.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('manage_doctors'))
 
-@app.route('/about')
-def about():
-    return "This is the about page."
+@app.route('/admin/patients')
+def manage_patients():
+    if 'username' in session:
+        patients = db.patients.find()
+        return render_template('Admin_Manage_Patients.html', patients=patients, action='Add')
+    else:
+        return redirect(url_for('home'))
 
-@app.route('/contact')
-def contact():
-    return "This is the contact page."
+@app.route('/admin/patients/add', methods=['POST'])
+def add_patient():
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    name = request.form['name']
+    last_name = request.form['last_name']
+    email = request.form['email']
+    ssn = int(request.form['ssn'])
+    dob = request.form['dob']
+    username = request.form['username']
+    password = request.form['password']
+
+    if not email.endswith('@gmail.com'):
+        return "Email must end with @gmail.com", 400
+
+    db.patients.insert_one({
+        'name': name,
+        'last_name': last_name,
+        'email': email,
+        'ssn': ssn,
+        'dob': datetime.datetime.strptime(dob, '%Y-%m-%d'),
+        'username': username,
+        'password': password
+    })
+    return redirect(url_for('manage_patients'))
+
+@app.route('/admin/patients/edit/<id>', methods=['POST'])
+def edit_patient(id):
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    name = request.form['name']
+    last_name = request.form['last_name']
+    email = request.form['email']
+    ssn = int(request.form['ssn'])
+    dob = request.form['dob']
+    username = request.form['username']
+    password = request.form['password']
+
+    if not email.endswith('@gmail.com'):
+        return "Email must end with @gmail.com", 400
+
+    db.patients.update_one(
+        {'_id': ObjectId(id)},
+        {'$set': {
+            'name': name,
+            'last_name': last_name,
+            'email': email,
+            'ssn': ssn,
+            'dob': datetime.datetime.strptime(dob, '%Y-%m-%d'),
+            'username': username,
+            'password': password
+        }}
+    )
+    return redirect(url_for('manage_patients'))
+
+@app.route('/admin/patients/delete/<id>', methods=['POST'])
+def delete_patient(id):
+    if 'username' not in session:
+        return redirect(url_for('home'))
+
+    db.patients.delete_one({'_id': ObjectId(id)})
+    return redirect(url_for('manage_patients'))
 
 if __name__ == '__main__':
     app.run(debug=True)
