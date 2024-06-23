@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-import datetime
+import datetime  # Import datetime module
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a real secret key
@@ -28,12 +28,20 @@ def home():
 def login():
     username = request.form['username']
     password = request.form['password']
+    
+    # Check for admin login
     admin = db.admin.find_one({'username': username, 'password': password})
     if admin:
         session['username'] = username  # Store the username in the session
         return redirect(url_for('admin_home'))
-    else:
-        return "Invalid credentials", 401
+    
+    # Check for patient login
+    patient = db.patients.find_one({'username': username, 'password': password})
+    if patient:
+        session['patient_username'] = username  # Store the patient username in the session
+        return redirect(url_for('patient_home'))
+    
+    return "Invalid credentials", 401
 
 @app.route('/admin')
 def admin_home():
@@ -45,6 +53,7 @@ def admin_home():
 @app.route('/logout')
 def logout():
     session.pop('username', None)  # Remove the username from the session
+    session.pop('patient_username', None)  # Remove the patient username from the session
     return redirect(url_for('home'))
 
 @app.route('/admin/doctors')
@@ -192,6 +201,41 @@ def delete_patient(id):
 
     db.patients.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('manage_patients'))
+
+@app.route('/signup')
+def signup_form():
+    return render_template('Signup.html')
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    name = request.form['name']
+    last_name = request.form['last_name']
+    email = request.form['email']
+    ssn = int(request.form['ssn'])
+    dob = request.form['dob']
+    username = request.form['username']
+    password = request.form['password']
+
+    if not email.endswith('@gmail.com'):
+        return "Email must end with @gmail.com", 400
+
+    db.patients.insert_one({
+        'name': name,
+        'last_name': last_name,
+        'email': email,
+        'ssn': ssn,
+        'dob': datetime.datetime.strptime(dob, '%Y-%m-%d'),
+        'username': username,
+        'password': password
+    })
+    return redirect(url_for('home'))
+
+@app.route('/patient')
+def patient_home():
+    if 'patient_username' in session:
+        return "Welcome to the patient home page!"
+    else:
+        return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)
