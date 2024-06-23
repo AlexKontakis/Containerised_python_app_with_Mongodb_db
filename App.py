@@ -39,6 +39,7 @@ def login():
     patient = db.patients.find_one({'username': username, 'password': password})
     if patient:
         session['patient_username'] = username  # Store the patient username in the session
+        session['patient_name'] = patient['name']
         return redirect(url_for('patient_home'))
     
     return "Invalid credentials", 401
@@ -50,10 +51,11 @@ def admin_home():
     else:
         return redirect(url_for('home'))
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 def logout():
     session.pop('username', None)  # Remove the username from the session
     session.pop('patient_username', None)  # Remove the patient username from the session
+    session.pop('patient_name', None)  # Remove the patient name from the session
     return redirect(url_for('home'))
 
 @app.route('/admin/doctors')
@@ -233,7 +235,8 @@ def signup():
 @app.route('/patient')
 def patient_home():
     if 'patient_username' in session:
-        return "Welcome to the patient home page!"
+        patient_name = session['patient_name']
+        return render_template('Patient_Home_Page.html', patient_name=patient_name)
     else:
         return redirect(url_for('home'))
 
