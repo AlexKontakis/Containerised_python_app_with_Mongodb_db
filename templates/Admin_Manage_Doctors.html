@@ -54,7 +54,14 @@
         <label for="appointment_cost">Appointment Cost:</label>
         <input type="number" step="0.01" id="appointment_cost" name="appointment_cost" required><br><br>
         <label for="specialization">Specialization:</label>
-        <input type="text" id="specialization" name="specialization" required><br><br>
+        <select name="specialization" id="specialization" required>
+            <option value="Cardiologist">Cardiologist</option>
+            <option value="Radiologist">Radiologist</option>
+            <option value="Allergist">Allergist</option>
+            <option value="Hematologist">Hematologist</option>
+            <option value="Pathologist">Pathologist</option>
+        </select>
+        <br><br>
         <button type="submit" id="form-button">Add Doctor</button>
         
     </form>
