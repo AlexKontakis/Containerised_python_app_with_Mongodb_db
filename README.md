@@ -16,7 +16,7 @@ cd YpoxreotikiErgasia24_E19069_Kontakis_Alexandros
 
 ```bash
 # Build the Docker image
-docker build -t hospital-app .
+docker build -t YpoxreotikiErgasia24_E19069_Kontakis_Alexandros .
 
 # Run the Docker container
 docker-compose up
