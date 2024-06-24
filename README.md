@@ -1,20 +1,14 @@
-# Hospital Management System
+# Υποχρεωτική Εργασία 2024 Πληροφοριακών Συστημάτων
 
-A web application built with Python Flask and MongoDB for managing hospital operations.
+Εφαρμογή σε Python Flask και MongoDB για διαχείρηση διεργασιών νοσοκομείου.
 
-## Table of Contents
+## Προαπαιτούμενα
+* Εγκατεστημένο Docker
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Dependencies](#dependencies)
-- [Configuration](#configuration)
-- [Contributing](#contributing)
-- [License](#license)
 
-## Installation
+##Εγκατάσταση
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/your_username/hospital-management.git
-cd hospital-management
+
