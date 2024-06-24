@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Appointment</title>
+    <script>
+        function confirmCancellation() {
+            var userInput = prompt("To confirm cancellation, please type 'cancel':");
+            if (userInput !== "cancel") {
+                alert("Cancellation not confirmed. Appointment not canceled.");
+                return false;  // Prevent form submission
+            }
+            return true;  // Proceed with form submission
+        }
+    </script>
+</head>
+<body>
+    <h1>Appointment Details</h1>
+    
+    <p><strong>Doctor:</strong> Dr. {{ appointment.doctor_name }} {{ appointment.doctor_last_name }}</p>
+    <p><strong>Date:</strong> {{ appointment.date.strftime('%Y-%m-%d') }}</p>
+    <p><strong>Time:</strong> {{ appointment.time }}</p>
+    <p><strong>Cost:</strong> ${{ appointment.cost }}</p>
+    <p><strong>Reason for Visit:</strong> {{ appointment.reason }}</p>
+    <p><strong>Specialization:</strong> {{ appointment.specialization }}</p>
+    <p><strong>Doctor's Username:</strong> {{ appointment.doctor_username }}</p>
+    <p><strong>Patient's Username:</strong> {{ appointment.patient_username }}</p>
+    
+    <form action="/patient/appointments/cancel/{{ appointment._id }}" method="post" onsubmit="return confirmCancellation()">
+        <button type="submit">Cancel Appointment</button>
+    </form>
+
+    <a href="/patient"><button>Back to Patient Home</button></a>
+</body>
+</html>

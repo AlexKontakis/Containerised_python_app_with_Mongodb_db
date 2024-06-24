@@ -315,25 +315,27 @@ def add_appointment():
 
     db.appointments.insert_one(appointment)
     return redirect(url_for('patient_home'))
-
-@app.route('/patient/appointments/delete/<id>', methods=['POST'])
-def delete_appointment(id):
+@app.route('/patient/appointments/view/<appointment_id>', methods=['GET'])
+def view_appointment(appointment_id):
     if 'patient_username' not in session:
         return redirect(url_for('home'))
 
-    # Ensure the appointment ID is converted to ObjectId
-    try:
-        appointment_id = ObjectId(id)
-    except:
-        return "Invalid appointment ID", 400
-
-    # Check if the appointment belongs to the logged-in patient
-    appointment = db.appointments.find_one({'_id': appointment_id, 'patient_username': session['patient_username']})
+    appointment = db.appointments.find_one({'_id': ObjectId(appointment_id)})
     if not appointment:
-        return "Appointment not found or you do not have permission to delete it", 404
+        return "Appointment not found", 404
 
-    # Proceed with deleting the appointment
-    db.appointments.delete_one({'_id': appointment_id})
+    return render_template('Patient_View_Appointment.html', appointment=appointment)
+
+
+
+
+@app.route('/patient/appointments/cancel/<appointment_id>', methods=['POST'])
+def cancel_appointment(appointment_id):
+    if 'patient_username' not in session:
+        return redirect(url_for('home'))
+
+    db.appointments.delete_one({'_id': ObjectId(appointment_id)})
+
     return redirect(url_for('patient_home'))
 
 

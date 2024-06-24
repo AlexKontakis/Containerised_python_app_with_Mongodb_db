@@ -31,8 +31,8 @@
                 <td>{{ appointment.reason }}</td>
                 <td>{{ appointment.specialization }}</td>
                 <td>
-                    <form action="/patient/appointments/delete/{{ appointment._id }}" method="post">
-                        <button type="submit">Delete Appointment</button>
+                    <form action="/patient/appointments/view/{{ appointment._id }}" method="get">
+                        <button type="submit">View</button>
                     </form>
                 </td>
             </tr>
@@ -40,7 +40,6 @@
         </tbody>
     </table>
     <a href="patient/appointments"><button>Setup Appointment</button></a>
-    
     <form action="/logout" method="post">
         <button type="submit">Logout</button>
     </form>
