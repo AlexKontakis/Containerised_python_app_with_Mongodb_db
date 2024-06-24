@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import datetime
@@ -43,6 +43,12 @@ def login():
         session['patient_last_name'] = patient['last_name']
         return redirect(url_for('patient_home'))
     
+    doctor = db.doctors.find_one({'username': username, 'password': password})
+    if doctor:
+        session['doctor_username'] = username
+        session['doctor_name'] = doctor['name']
+        session['doctor_last_name'] = doctor['last_name']
+        return redirect(url_for('doctor_home'))
     return "Invalid credentials", 401
 
 @app.route('/admin')
@@ -234,6 +240,62 @@ def signup():
     })
     return redirect(url_for('home'))
 
+@app.route('/doctor')
+def doctor_home():
+    if 'doctor_username' in session:
+        doctor_username = session['doctor_username']
+        doctor_name = session['doctor_name']
+
+        appointments = db.appointments.find({'doctor_username': doctor_username})
+
+        return render_template('Doctor_Home_Page.html', doctor_name=doctor_name, appointments=appointments)
+    
+@app.route('/doctor/change_cost', methods=['POST'])
+def change_cost():
+    if 'doctor_username' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        new_cost = float(request.form.get('new_cost'))
+        
+        if new_cost < 0:
+            flash("Cost must be a positive number.", 'error')
+            return redirect(url_for('doctor_home'))
+
+        doctor_username = session['doctor_username']
+        db.appointments.update_many({'doctor_username': doctor_username}, {'$set': {'cost': new_cost}})
+        
+        flash("Appointment cost changed successfully!", 'success')
+        return redirect(url_for('doctor_home'))
+
+    return redirect(url_for('doctor_home'))
+    
+@app.route('/doctor/change_password', methods=['GET', 'POST'])
+def change_password():
+    if 'doctor_username' not in session:
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('new_password')
+        confirm_password = request.form.get('confirm_password')
+
+        if new_password != confirm_password:
+            flash("Passwords do not match. Please try again.", 'error')
+            return redirect(url_for('change_password'))
+
+        doctor_username = session['doctor_username']
+        doctor = db.doctors.find_one({'username': doctor_username})
+
+        if doctor and doctor['password'] == new_password:
+            flash("New password cannot be the same as the current password. Please choose a different password.", 'error')
+            return redirect(url_for('change_password'))
+
+        db.doctors.update_one({'username': doctor_username}, {'$set': {'password': new_password}})
+        
+        flash("Password changed successfully!", 'success')
+        return redirect(url_for('doctor_home'))
+
+    return render_template('Doctor_Change_Password.html')
 @app.route('/patient')
 def patient_home():
     if 'patient_username' in session:
