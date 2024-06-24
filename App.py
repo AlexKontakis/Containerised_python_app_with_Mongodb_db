@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from pymongo import MongoClient
 from bson.objectid import ObjectId
-import datetime
+from datetime import datetime
+import os
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'  # Replace with a real secret key
 
 # Connect to MongoDB
-client = MongoClient('mongodb://localhost:27017/')
+mongo_uri = os.getenv('MONGO_URI', 'mongodb://localhost:27017/HospitalDB')
+client = MongoClient(mongo_uri)
 db = client['HospitalDB']
 
 # Initialize the admin collection
@@ -212,33 +214,46 @@ def delete_patient(id):
     db.patients.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('manage_patients'))
 
-@app.route('/signup')
+@app.route('/signup_menu')
 def signup_form():
     return render_template('Signup.html')
 
-@app.route('/signup', methods=['POST'])
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
-    name = request.form['name']
-    last_name = request.form['last_name']
-    email = request.form['email']
-    ssn = int(request.form['ssn'])
-    dob = request.form['dob']
-    username = request.form['username']
-    password = request.form['password']
+    if request.method == 'POST':
+        # Get form data
+        name = request.form['name']
+        last_name = request.form['last_name']
+        email = request.form['email']
+        ssn = int(request.form['ssn'])
+        date_of_birth_str = request.form['date_of_birth']
+        username = request.form['username']
+        password = request.form['password']
 
-    if not email.endswith('@gmail.com'):
-        return "Email must end with @gmail.com", 400
+        # Convert date_of_birth string to datetime object
+        try:
+            date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d')
+        except ValueError:
+            flash('Invalid date format. Please use YYYY-MM-DD.')
+            return redirect(url_for('signup'))
 
-    db.patients.insert_one({
-        'name': name,
-        'last_name': last_name,
-        'email': email,
-        'ssn': ssn,
-        'dob': datetime.datetime.strptime(dob, '%Y-%m-%d'),
-        'username': username,
-        'password': password
-    })
-    return redirect(url_for('home'))
+        # Create the patient document
+        patient = {
+            'name': name,
+            'last_name': last_name,
+            'email': email,
+            'ssn': ssn,
+            'date_of_birth': date_of_birth,
+            'username': username,
+            'password': password  # Note: In a real application, passwords should be hashed
+        }
+
+        # Insert the patient into the database
+        db.patients.insert_one(patient)
+        flash('Account created successfully!')
+        return redirect(url_for('home'))
+
+    
 
 @app.route('/doctor')
 def doctor_home():
@@ -316,6 +331,8 @@ def setup_appointment_form():
     else:
         return redirect(url_for('home'))
 
+
+
 @app.route('/patient/appointments/available-doctors', methods=['POST'])
 def available_doctors():
     if 'patient_username' not in session:
@@ -331,12 +348,15 @@ def available_doctors():
     # Calculate end time for the appointment
     end_time = (hour + 1) % 24
 
+    # Parse date string to datetime object
+    appointment_date = datetime.strptime(date, '%Y-%m-%d')
+
     # Fetch all doctors with the specified specialization
     doctors = db.doctors.find({'specialization': specialization})
 
     # Fetch existing appointments for the specified date and time
     existing_appointments = db.appointments.find({
-        'date': datetime.datetime.strptime(date, '%Y-%m-%d'),
+        'date': appointment_date,
         '$or': [
             {'time': time},
             {'time': str(end_time) + ':00'}
@@ -348,35 +368,59 @@ def available_doctors():
 
     return render_template('Available_Doctors.html', doctors=available_doctors, date=date, time=time)
 
+
 @app.route('/patient/appointments/add', methods=['POST'])
 def add_appointment():
     if 'patient_username' not in session:
-        return redirect(url_for('home'))
-
+        flash('You need to log in to make an appointment.')
+        return redirect(url_for('login'))
+    
+    patient_username = session['patient_username']
     doctor_id = request.form['doctor']
-    date = request.form['date']
-    time = request.form['time']
+    appointment_date_str = request.form['date']
+    appointment_time = request.form['time']
     reason = request.form['reason']
 
-    patient = db.patients.find_one({'username': session['patient_username']})
+    # Convert appointment_date string to datetime object
+    try:
+        appointment_date = datetime.strptime(appointment_date_str, '%Y-%m-%d')
+    except ValueError:
+        flash('Invalid date format. Please use YYYY-MM-DD.')
+        return redirect(url_for('available_doctors'))
+    
+    # Find the doctor in the database
     doctor = db.doctors.find_one({'_id': ObjectId(doctor_id)})
 
+    if not doctor:
+        flash('Doctor not found.')
+        return redirect(url_for('available_doctors'))
+
+    patient = db.patients.find_one({'username': patient_username})
+
+    if not patient:
+        flash('Patient not found.')
+        return redirect(url_for('login'))
+
+    # Create the appointment document
     appointment = {
         'patient_name': patient['name'],
         'patient_last_name': patient['last_name'],
         'doctor_name': doctor['name'],
         'doctor_last_name': doctor['last_name'],
-        'date': datetime.datetime.strptime(date, '%Y-%m-%d'),
-        'time': time,
+        'date': appointment_date,
+        'time': appointment_time,
         'cost': doctor['appointment_cost'],
         'reason': reason,
         'specialization': doctor['specialization'],
         'doctor_username': doctor['username'],
-        'patient_username': patient['username']
+        'patient_username': patient_username
     }
 
+    # Insert the appointment into the database
     db.appointments.insert_one(appointment)
+    flash('Appointment scheduled successfully!')
     return redirect(url_for('patient_home'))
+
 @app.route('/patient/appointments/view/<appointment_id>', methods=['GET'])
 def view_appointment(appointment_id):
     if 'patient_username' not in session:
@@ -402,4 +446,4 @@ def cancel_appointment(appointment_id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
