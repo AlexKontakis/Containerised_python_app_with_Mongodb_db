@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Doctors</title>
+</head>
+<body>
+    <h1>Available Doctors</h1>
+
+    <h2>Doctors Available for {{ date }} at {{ time }}</h2>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th>Specialization</th>
+                <th>Appointment Cost</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for doctor in doctors %}
+            <tr>
+                <td>{{ doctor.name }}</td>
+                <td>{{ doctor.last_name }}</td>
+                <td>{{ doctor.email }}</td>
+                <td>{{ doctor.specialization }}</td>
+                <td>${{ doctor.appointment_cost }}</td>
+                <td>
+                    <form action="/patient/appointments/add" method="post">
+                        <input type="hidden" name="doctor" value="{{ doctor._id }}">
+                        <input type="hidden" name="date" value="{{ date }}">
+                        <input type="hidden" name="time" value="{{ time }}">
+                        <input type="hidden" name="reason" value="Routine check-up"> <!-- Example reason, customize as needed -->
+                        <button type="submit">Schedule Appointment</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <button onclick="window.location.href='/patient/appointments'">Back</button>
+    
+</body>
+</html>
