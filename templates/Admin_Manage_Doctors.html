@@ -27,7 +27,7 @@
             <td>{{ doctor.appointment_cost }}</td>
             <td>{{ doctor.specialization }}</td>
             <td>
-                <button onclick="editDoctor('{{ doctor._id }}', '{{ doctor.name }}', '{{ doctor.last_name }}', '{{ doctor.email }}', '{{ doctor.username }}', '{{ doctor.password }}', {{ doctor.appointment_cost }}, '{{ doctor.specialization }}')">Edit</button>
+                <button onclick="editDoctor('{{ doctor._id }}', '{{ doctor.name }}', '{{ doctor.last_name }}', '{{ doctor.email }}', '{{ doctor.username }}', '{{ doctor.password }}', '{{ doctor.appointment_cost }}', '{{ doctor.specialization }}')">Edit</button>
                 <form action="/admin/doctors/delete/{{ doctor._id }}" method="post" style="display:inline;">
                     <button type="submit">Delete</button>
                 </form>
