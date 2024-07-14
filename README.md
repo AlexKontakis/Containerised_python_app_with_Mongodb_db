@@ -40,7 +40,7 @@
   - **Patient_Home_Page.html**: Η αρχική σελίδα του ασθενή.
   - **Doctor_Home_Page.html**: Η αρχική σελίδα του γιατρού.
   - **Available_Doctors.html**: Σελίδα για την επιλογή διαθέσιμων γιατρών για ραντεβού.
-  - **View_Appointment.html**: Σελίδα για την προβολή των λεπτομερειών ενός ραντεβού.
+  - **Patient_View_Appointment.html**: Σελίδα για την προβολή των λεπτομερειών ενός ραντεβού.
   - **Change_Password.html**: Σελίδα για την αλλαγή κωδικού πρόσβασης.
   - **Change_Appointment_Cost.html**: Σελίδα για την αλλαγή κόστους ραντεβού.
 
