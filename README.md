@@ -86,6 +86,7 @@
 ![signup](https://github.com/user-attachments/assets/cd7f1d00-c5fa-4711-aa49-931d49e77a63)
 - **Προγραμματισμός Ραντεβού**: Επιλέξτε διαθέσιμους γιατρούς και προγραμματίστε ένα ραντεβού.<br/>
 ![Setup_Appointment](https://github.com/user-attachments/assets/e09a5c60-cb9d-4579-a234-b001bb0b09d3)
+![available_doctors](https://github.com/user-attachments/assets/b56f8747-7471-4800-96e9-81dc78dc0c1b)
 - **Προβολή Ραντεβού**: Προβολή όλων των ραντεβού σας στην αρχική σας σελίδα.<br/>
 ![Patient_home](https://github.com/user-attachments/assets/da364d3b-9606-43b0-b878-229b8ee90374)
 - **Ακύρωση Ραντεβού**: Ακύρωση ενός ραντεβού με επιβεβαίωση.<br/>
