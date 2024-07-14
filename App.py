@@ -62,10 +62,10 @@ def admin_home():
 
 @app.route('/logout', methods=['POST'])
 def logout():
-    session.pop('username', None)  # Remove the username from the session
-    session.pop('patient_username', None)  # Remove the patient username from the session
-    session.pop('patient_name', None)  # Remove the patient name from the session
-    session.pop('patient_last_name', None)  # Remove the patient last name from the session
+    session.pop('username', None)  # Remove username from session
+    session.pop('patient_username', None)  # Remove patient username from session
+    session.pop('patient_name', None)  # Remove patient name from session
+    session.pop('patient_last_name', None)  # Remove patient last name from session
     return redirect(url_for('home'))
 
 @app.route('/admin/doctors')
@@ -80,7 +80,7 @@ def manage_doctors():
 def add_doctor():
     if 'username' not in session:
         return redirect(url_for('home'))
-
+     # Get form data for the new doctor
     name = request.form['name']
     last_name = request.form['last_name']
     email = request.form['email']
@@ -88,10 +88,10 @@ def add_doctor():
     password = request.form['password']
     appointment_cost = float(request.form['appointment_cost'])
     specialization = request.form['specialization']
-
+    #check if the email ends with @gmail.com
     if not email.endswith('@gmail.com'):
         return "Email must end with @gmail.com", 400
-
+    #insert new doctor in db
     db.doctors.insert_one({
         'name': name,
         'last_name': last_name,
@@ -107,7 +107,7 @@ def add_doctor():
 def edit_doctor(id):
     if 'username' not in session:
         return redirect(url_for('home'))
-
+    #get data from form for edit
     name = request.form['name']
     last_name = request.form['last_name']
     email = request.form['email']
@@ -115,10 +115,10 @@ def edit_doctor(id):
     password = request.form['password']
     appointment_cost = float(request.form['appointment_cost'])
     specialization = request.form['specialization']
-
+    #check if the email ends with @gmail.com
     if not email.endswith('@gmail.com'):
         return "Email must end with @gmail.com", 400
-
+    #update the doctor information in db
     db.doctors.update_one(
         {'_id': ObjectId(id)},
         {'$set': {
@@ -137,7 +137,7 @@ def edit_doctor(id):
 def delete_doctor(id):
     if 'username' not in session:
         return redirect(url_for('home'))
-
+    # Delete selected doctor from db
     db.doctors.delete_one({'_id': ObjectId(id)})
     return redirect(url_for('manage_doctors'))
 
@@ -149,62 +149,8 @@ def manage_patients():
     else:
         return redirect(url_for('home'))
 
-@app.route('/admin/patients/add', methods=['POST'])
-def add_patient():
-    if 'username' not in session:
-        return redirect(url_for('home'))
 
-    name = request.form['name']
-    last_name = request.form['last_name']
-    email = request.form['email']
-    ssn = int(request.form['ssn'])
-    dob = request.form['dob']
-    username = request.form['username']
-    password = request.form['password']
 
-    if not email.endswith('@gmail.com'):
-        return "Email must end with @gmail.com", 400
-
-    db.patients.insert_one({
-        'name': name,
-        'last_name': last_name,
-        'email': email,
-        'ssn': ssn,
-        'dob': datetime.datetime.strptime(dob, '%Y-%m-%d'),
-        'username': username,
-        'password': password
-    })
-    return redirect(url_for('manage_patients'))
-
-@app.route('/admin/patients/edit/<id>', methods=['POST'])
-def edit_patient(id):
-    if 'username' not in session:
-        return redirect(url_for('home'))
-
-    name = request.form['name']
-    last_name = request.form['last_name']
-    email = request.form['email']
-    ssn = int(request.form['ssn'])
-    dob = request.form['dob']
-    username = request.form['username']
-    password = request.form['password']
-
-    if not email.endswith('@gmail.com'):
-        return "Email must end with @gmail.com", 400
-
-    db.patients.update_one(
-        {'_id': ObjectId(id)},
-        {'$set': {
-            'name': name,
-            'last_name': last_name,
-            'email': email,
-            'ssn': ssn,
-            'dob': datetime.datetime.strptime(dob, '%Y-%m-%d'),
-            'username': username,
-            'password': password
-        }}
-    )
-    return redirect(url_for('manage_patients'))
 
 @app.route('/admin/patients/delete/<id>', methods=['POST'])
 def delete_patient(id):
@@ -221,7 +167,7 @@ def signup_form():
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
-        # Get form data
+        # get the data from form
         name = request.form['name']
         last_name = request.form['last_name']
         email = request.form['email']
@@ -230,14 +176,14 @@ def signup():
         username = request.form['username']
         password = request.form['password']
 
-        # Convert date_of_birth string to datetime object
+        # Convert date_of_birth to datetime object
         try:
             date_of_birth = datetime.strptime(date_of_birth_str, '%Y-%m-%d')
         except ValueError:
             flash('Invalid date format. Please use YYYY-MM-DD.')
             return redirect(url_for('signup'))
 
-        # Create the patient document
+        # Create patient
         patient = {
             'name': name,
             'last_name': last_name,
@@ -248,9 +194,9 @@ def signup():
             'password': password  # Note: In a real application, passwords should be hashed
         }
 
-        # Insert the patient into the database
+        # Insert the patient in db
         db.patients.insert_one(patient)
-        flash('Account created successfully!')
+        
         return redirect(url_for('home'))
 
     
@@ -280,7 +226,7 @@ def change_cost():
         doctor_username = session['doctor_username']
         db.appointments.update_many({'doctor_username': doctor_username}, {'$set': {'cost': new_cost}})
         
-        flash("Appointment cost changed successfully!", 'success')
+        
         return redirect(url_for('doctor_home'))
 
     return redirect(url_for('doctor_home'))
@@ -307,7 +253,7 @@ def change_password():
 
         db.doctors.update_one({'username': doctor_username}, {'$set': {'password': new_password}})
         
-        flash("Password changed successfully!", 'success')
+        
         return redirect(url_for('doctor_home'))
 
     return render_template('Doctor_Change_Password.html')
@@ -317,7 +263,7 @@ def patient_home():
         patient_username = session['patient_username']
         patient_name = session['patient_name']
         
-        # Fetch all appointments for the logged-in patient
+        # Show appointments for the logged in patient
         appointments = db.appointments.find({'patient_username': patient_username})
         
         return render_template('Patient_Home_Page.html', patient_name=patient_name, appointments=appointments)
@@ -342,19 +288,19 @@ def available_doctors():
     date = request.form['date']
     time = request.form['time']
 
-    # Convert time to integer
+    # Convert time to int
     hour = int(time.split(':')[0])
 
-    # Calculate end time for the appointment
+    # Calculate end time for the appointment (each appointment is 1 hour)
     end_time = (hour + 1) % 24
 
-    # Parse date string to datetime object
+    # Parse date string to datetime
     appointment_date = datetime.strptime(date, '%Y-%m-%d')
 
-    # Fetch all doctors with the specified specialization
+    # Fetch all doctors with the specified spec
     doctors = db.doctors.find({'specialization': specialization})
 
-    # Fetch existing appointments for the specified date and time
+    # Fetch existing appointments for the specified date, time
     existing_appointments = db.appointments.find({
         'date': appointment_date,
         '$or': [
@@ -372,7 +318,7 @@ def available_doctors():
 @app.route('/patient/appointments/add', methods=['POST'])
 def add_appointment():
     if 'patient_username' not in session:
-        flash('You need to log in to make an appointment.')
+        
         return redirect(url_for('login'))
     
     patient_username = session['patient_username']
@@ -385,23 +331,23 @@ def add_appointment():
     try:
         appointment_date = datetime.strptime(appointment_date_str, '%Y-%m-%d')
     except ValueError:
-        flash('Invalid date format. Please use YYYY-MM-DD.')
+        
         return redirect(url_for('available_doctors'))
     
-    # Find the doctor in the database
+    #find doctor 
     doctor = db.doctors.find_one({'_id': ObjectId(doctor_id)})
 
     if not doctor:
-        flash('Doctor not found.')
+        
         return redirect(url_for('available_doctors'))
 
     patient = db.patients.find_one({'username': patient_username})
 
     if not patient:
-        flash('Patient not found.')
+        
         return redirect(url_for('login'))
 
-    # Create the appointment document
+    # Create appointment
     appointment = {
         'patient_name': patient['name'],
         'patient_last_name': patient['last_name'],
@@ -416,9 +362,9 @@ def add_appointment():
         'patient_username': patient_username
     }
 
-    # Insert the appointment into the database
+    # Insert the appointment in db
     db.appointments.insert_one(appointment)
-    flash('Appointment scheduled successfully!')
+    
     return redirect(url_for('patient_home'))
 
 @app.route('/patient/appointments/view/<appointment_id>', methods=['GET'])
