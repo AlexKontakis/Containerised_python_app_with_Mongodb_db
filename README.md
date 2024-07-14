@@ -63,7 +63,7 @@
 ## Τρόπος Χρήσης του Συστήματος
 
 ### Για τους Admins:
-- **Σύνδεση**: Χρησιμοποιήστε τα διαπιστευτήρια admin.
+- **Σύνδεση**: Χρησιμοποιήστε τα διαπιστευτήρια admin.__
 ![Screenshot 2024-07-14 005335](https://github.com/user-attachments/assets/bf9002cf-35b6-4b12-ad2a-c8bc4c214aa9)
 - **Διαχείριση Γιατρών**: Προσθήκη, επεξεργασία και διαγραφή γιατρών.
 ![Admin_Manage_Doctors](https://github.com/user-attachments/assets/2f2892dd-35c0-4cd9-a193-1d162327ec58)
