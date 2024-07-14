@@ -26,7 +26,7 @@
 - **HTML/CSS** για το front-end
 - **JavaScript** για διαδραστικότητα στο front-end
 
-## Περιγραφή των Αρχείων που κατασκευάσατε
+## Περιγραφή των Αρχείων που κατασκευάστηκαν
 
 - **app.py**: Το κύριο αρχείο της εφαρμογής Flask, περιέχει όλες τις διαδρομές και τη λογική του backend.
 - **Dockerfile**: Ορίζει τον τρόπο με τον οποίο θα κατασκευαστεί η εικόνα του Docker για το Flask app.
@@ -93,7 +93,7 @@
 ![Patient_appointment](https://github.com/user-attachments/assets/d2ffb8b4-687f-4ecd-b865-2db9b07bc2c6)
 
 
-## Αναφορές που χρησιμοποιήσατε
+## Αναφορές που χρησιμοποιήθηκαν
 
 - Flask Documentation: [https://flask.palletsprojects.com/](https://flask.palletsprojects.com/)
 - MongoDB Documentation: [https://docs.mongodb.com/](https://docs.mongodb.com/)
