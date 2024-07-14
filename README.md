@@ -54,7 +54,8 @@
 
 2. **Εκκίνηση των containers με Docker Compose:**
     ```sh
-    docker-compose up --build
+    docker-compose build
+    docker-compose up 
     ```
 
 3. **Πρόσβαση στην εφαρμογή:**
